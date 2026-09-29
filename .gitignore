@@ -1,0 +1,127 @@
+# CV-Scope .gitignore
+#
+# The repository holds source code, documentation and demo material only.
+# Everything a running installation produces (database, recordings, camera
+# frames, enrolled faces, licences, keys, exports, model weights) stays local.
+# Patterns starting with "/" only match at the repository root.
+
+# ---- Secrets and local configuration ------------------------------------------
+.env
+.env.*
+!.env.example
+# Licence issuer private keys (cvscope recognition keygen) and any other key files
+*.key
+*.pem
+*.p12
+*.pfx
+# Local Claude Code / editor settings that belong to one person
+.claude/settings.local.json
+CLAUDE.local.md
+
+# ---- Recognition licences (signed for one licensee, never shared) ---------------
+license.json
+licence.json
+*.license.json
+*.licence.json
+
+# ---- Runtime data: database, recordings, enrollment, videos, models, logs --------
+# PATHSCOPE_DATA_DIR defaults to ./data; only the placeholder is committed.
+/data/*
+!/data/.gitkeep
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite
+*.sqlite3
+*.log
+/logs/
+/recordings/
+
+# Model weights are downloaded on demand by the Model Manager, never committed.
+# (Root-anchored: backend/pathscope/models/ is source code.)
+/models/
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+*.safetensors
+
+# ---- Personal media: recordings, snapshots, camera frames, evidence pictures -----
+*.mp4
+*.webm
+*.avi
+*.mkv
+*.mov
+*.m4v
+*.h264
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+*.webp
+*.tif
+*.tiff
+*.heic
+# ...except the demo material that ships with the project
+!docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.gif
+!docs/**/*.webp
+!frontend/public/**
+# Demo videos are downloaded by scripts/download_samples.py (CC-BY-4.0, see samples/README.md)
+/samples/videos/
+
+# ---- Files exported from the app ------------------------------------------------
+# Event, recognition and relationship exports, recording downloads, scene exports
+# and Anomaly Assistant evidence describe a real site: keep them out of the repo.
+/pathscope_*
+/cvscope_*
+/pathscope-run*
+/cvscope-run*
+/relationships-*
+/scene_camera*.json
+*.parquet
+anomalies.jsonl
+/exports/
+
+# Internal build brief (not project documentation)
+/ProjectDetails.md
+
+# ---- Python ------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+/build/
+/backend/build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- Node / frontend ---------------------------------------------------------------
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+npm-debug.log*
+coverage/
+playwright-report/
+test-results/
+
+# ---- OS / editor -------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+*.swp
+*.tmp
+.idea/
+.vscode/

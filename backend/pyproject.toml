@@ -1,0 +1,70 @@
+[project]
+name = "pathscope"
+version = "0.1.0"
+description = "Configurable computer-vision monitoring and research platform for fixed cameras"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "CV-Scope contributors" }]
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "pydantic>=2.7,<3",
+  "pydantic-settings>=2.3,<3",
+  "sqlalchemy>=2.0.30,<3",
+  "alembic>=1.13,<2",
+  "numpy>=1.26",
+  "opencv-python>=4.10,<5",
+  "psutil>=5.9",
+  "py-cpuinfo>=9.0",
+  "nvidia-ml-py>=12.535",
+  "scipy>=1.11",
+  "structlog>=24.1",
+  "python-multipart>=0.0.9",
+  "httpx>=0.27",
+  "websockets>=12",
+]
+
+[project.optional-dependencies]
+# Ultralytics YOLO11 / YOLOv8 / RT-DETR. AGPL-3.0 licensed; see docs/models.md.
+ultralytics = ["ultralytics>=8.3"]
+# PyTorch and torchvision. Install CUDA builds from the PyTorch index for GPU use.
+torch = ["torch>=2.2", "torchvision>=0.17"]
+# ONNX Runtime, CPU-only build (do not install together with onnx-gpu).
+onnx-cpu = ["onnxruntime>=1.17"]
+# ONNX Runtime with CUDA / TensorRT execution providers.
+onnx-gpu = ["onnxruntime-gpu>=1.17"]
+postgres = ["psycopg[binary]>=3.1"]
+export = ["pyarrow>=15"]
+# Anthropic Claude as the Anomaly Assistant's vision model (the other providers need nothing extra).
+llm = ["anthropic>=1.0"]
+# onnx and anthropic are needed by the tests of the ONNX re-identification and Claude code paths
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.5", "mypy>=1.10", "httpx>=0.27", "onnx>=1.16", "anthropic>=1.0"]
+
+[project.scripts]
+cvscope = "pathscope.cli:main"
+# Former name of the command, kept so existing scripts keep working.
+pathscope = "pathscope.cli:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["pathscope*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008", "B027"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true

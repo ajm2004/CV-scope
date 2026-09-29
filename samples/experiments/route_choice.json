@@ -1,0 +1,26 @@
+{
+  "project_id": 1,
+  "camera_id": 1,
+  "name": "Corridor route choice",
+  "description": "Which exit do people take after passing the entrance gate?",
+  "notes": "Baseline condition: no signage.",
+  "condition_notes": "Daylight, normal office hours.",
+  "tags": ["route-choice", "baseline"],
+  "object_classes": ["person"],
+  "model_id": "",
+  "tracker_id": "bytetrack",
+  "inference": {
+    "preset": "auto",
+    "provider": "auto",
+    "device": "auto",
+    "image_size": null,
+    "confidence": 0.25,
+    "iou": 0.5,
+    "half": null,
+    "processing_fps": null,
+    "frame_skip": 0,
+    "realtime": false
+  },
+  "tracker_settings": {},
+  "rules": []
+}

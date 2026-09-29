@@ -1,0 +1,122 @@
+/* Scene overlay on camera pictures (experiment page) and its legend. */
+
+.scene-frame {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+}
+.scene-frame > img {
+  display: block;
+  max-width: 100%;
+}
+.scene-frame.placeholder {
+  background: #1b1f1d;
+  outline: 1px dashed #3f4642;
+  outline-offset: -1px;
+}
+.scene-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.scene-overlay svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.scene-overlay .scene-object,
+.scene-overlay .scene-route {
+  pointer-events: visiblePainted;
+  cursor: help;
+}
+.scene-label {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 1px 5px;
+  background: rgba(20, 23, 22, 0.8);
+  border: 1px solid transparent;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.scene-label.hl {
+  background: rgba(20, 23, 22, 0.94);
+  z-index: 1;
+}
+.scene-label-type {
+  margin-left: 5px;
+  font-size: 10px;
+  font-weight: 400;
+  color: #c9cfcb;
+}
+.scene-forward {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 2px #000, 0 0 3px #000, 0 0 4px #000;
+  pointer-events: none;
+}
+.scene-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-top: 6px;
+}
+.scene-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+  font-size: var(--fs-1);
+  cursor: default;
+}
+.scene-chip.hl {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.scene-chip.off {
+  opacity: 0.6;
+}
+.scene-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+.scene-swatch.checkpoint {
+  border-style: dashed;
+}
+.scene-swatch.ignore {
+  background: #c5ccc8;
+}
+.scene-swatch.line {
+  height: 0;
+  width: 16px;
+  border: 0;
+  border-top: 3px solid currentColor;
+  border-radius: 0;
+}
+.scene-swatch.route {
+  height: 0;
+  width: 16px;
+  border: 0;
+  border-top: 2px dashed currentColor;
+  border-radius: 0;
+}
+.scene-view-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}

@@ -1,0 +1,62 @@
+# docker compose up                      -> CPU image, SQLite in the cvscope-data volume
+# docker compose --profile gpu up cvscope-gpu -> NVIDIA GPU image only (needs the NVIDIA Container Toolkit)
+# docker compose --profile postgres up   -> adds PostgreSQL; set PATHSCOPE_DATABASE_URL as below
+
+services:
+  cvscope:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cv-scope:cpu
+    ports:
+      # CV-Scope has no login: reachable from this computer only. Use "8420:8420"
+      # to open it to the network (see docs/guides/21-deploy-a-study.md).
+      - "127.0.0.1:8420:8420"
+    volumes:
+      - cvscope-data:/app/data
+      # Mount local videos read-only to register them from the Cameras page:
+      # - ./samples/videos:/videos:ro
+    environment:
+      PATHSCOPE_LOG_FORMAT: json
+      # PATHSCOPE_DATABASE_URL: postgresql+psycopg://pathscope:pathscope@postgres:5432/pathscope
+      # Licensed recognition modules: the licence issuer's public key (docs/recognition.md)
+      # PATHSCOPE_RECOGNITION_ISSUER_KEYS: ""
+    restart: unless-stopped
+
+  cvscope-gpu:
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    image: cv-scope:cuda
+    ports:
+      - "127.0.0.1:8420:8420"
+    volumes:
+      - cvscope-data:/app/data
+    environment:
+      PATHSCOPE_LOG_FORMAT: json
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  postgres:
+    profiles: ["postgres"]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pathscope
+      POSTGRES_PASSWORD: pathscope
+      POSTGRES_DB: pathscope
+    volumes:
+      - cvscope-pg:/var/lib/postgresql/data
+    ports:
+      # Development database with a default password: reachable from this computer only.
+      - "127.0.0.1:5432:5432"
+
+volumes:
+  cvscope-data:
+  cvscope-pg:

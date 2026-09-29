@@ -1,0 +1,34 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security problems do not belong here: report them privately (see SECURITY.md).
+        Do not attach camera pictures, recordings or exports that show real people, places or plates.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Source type (video file, USB, RTSP), the scene and experiment settings, what you clicked.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: CV-Scope version or commit, OS, Python and Node versions, GPU; the output of `cvscope hardware` helps.
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant server log lines or browser console errors.
+      render: text

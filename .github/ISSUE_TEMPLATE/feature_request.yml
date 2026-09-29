@@ -1,0 +1,19 @@
+name: Feature request
+description: A study, measurement or workflow CV-Scope should support
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to measure or do?
+      description: The research question or operational need, not only the proposed solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do today instead

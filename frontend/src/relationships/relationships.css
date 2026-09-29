@@ -1,0 +1,221 @@
+/* Relationship pages: explorer layout, entity list, graph, timeline. Uses the global tokens. */
+
+.rel-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 250px) minmax(0, 1fr) minmax(280px, 380px);
+  gap: var(--gap);
+  align-items: start;
+}
+@media (max-width: 1300px) {
+  .rel-layout {
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+  }
+  .rel-layout .rel-evidence {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 800px) {
+  .rel-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.rel-evidence {
+  position: sticky;
+  top: calc(var(--top-h) + 8px);
+  max-height: calc(100vh - var(--top-h) - 24px);
+  overflow: auto;
+}
+
+.rel-entity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 62vh;
+  overflow: auto;
+  border-top: 1px solid var(--line);
+}
+.rel-entity-list li button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--surface-3);
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.rel-entity-list li button:hover {
+  background: var(--surface-2);
+}
+.rel-entity-list li.selected button {
+  background: var(--accent-soft);
+}
+.rel-entity-list li button:disabled {
+  cursor: default;
+  color: var(--text-3);
+}
+
+.rel-ent {
+  display: inline-block;
+  width: 1.1em;
+  text-align: center;
+  color: var(--text-3);
+}
+.rel-ent-identity {
+  color: var(--accent);
+}
+.rel-ent-place {
+  color: var(--ok);
+}
+.rel-ent-event {
+  color: var(--warn);
+}
+
+.rel-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  background: var(--surface);
+}
+.rel-table {
+  margin-top: 6px;
+}
+.rel-table td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.rel-meter {
+  display: inline-block;
+  width: 90px;
+  height: 6px;
+  background: var(--surface-3);
+  border-radius: 3px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.rel-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.rel-components {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rel-component {
+  display: grid;
+  grid-template-columns: 150px 96px 44px;
+  align-items: center;
+  gap: 6px;
+}
+.rel-reason {
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.rel-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.rel-count {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.rel-count .num {
+  font-size: var(--fs-4);
+  font-weight: 600;
+}
+
+.rel-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rel-timeline li {
+  display: grid;
+  grid-template-columns: 86px 16px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--surface-3);
+}
+.rel-timeline li.clickable {
+  cursor: pointer;
+}
+.rel-timeline li.clickable:hover {
+  background: var(--surface-2);
+}
+.rel-timeline li.selected {
+  background: var(--accent-soft);
+}
+.rel-timeline .dot {
+  width: 9px;
+  height: 9px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.rel-timeline li.kind-relationship .dot {
+  background: var(--accent);
+}
+.rel-timeline li.kind-correlated .dot {
+  background: var(--warn);
+  border-radius: 2px;
+}
+.rel-timeline li.day {
+  display: block;
+  padding: 8px 10px 4px;
+  font-weight: 600;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.rel-summary {
+  white-space: pre-wrap;
+  font-size: var(--fs-2);
+  line-height: 1.55;
+}
+.rel-summary .span {
+  font-family: var(--mono);
+  color: var(--text-2);
+  margin-right: 6px;
+}
+
+.linklike {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+.linklike:hover {
+  text-decoration: underline;
+}
+
+.rel-step {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px;
+  background: var(--surface-2);
+}
+.rel-json {
+  width: 100%;
+  min-height: 320px;
+  font-family: var(--mono);
+  font-size: var(--fs-1);
+}

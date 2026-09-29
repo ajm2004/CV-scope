@@ -1,0 +1,20 @@
+# Every change needs the approval of a code owner (enforced by the main branch
+# ruleset). The explicit entries mark where a malicious change does the most
+# damage; read those diffs line by line. Later lines take precedence.
+*                                   @ajm2004
+
+# CI, this file, the guard script and the rulesets decide what "checks passed" means
+/.github/                           @ajm2004
+# Scripts people run on their own machines, and what goes into the images
+/scripts/                           @ajm2004
+/Dockerfile*                        @ajm2004
+/docker-compose.yml                 @ajm2004
+# Dependencies
+/backend/pyproject.toml             @ajm2004
+/frontend/package.json              @ajm2004
+/frontend/package-lock.json         @ajm2004
+# Model download URLs, licence verification, biometric data handling
+/backend/pathscope/models/          @ajm2004
+/backend/pathscope/recognition/     @ajm2004
+/LICENSE                            @ajm2004
+/SECURITY.md                        @ajm2004

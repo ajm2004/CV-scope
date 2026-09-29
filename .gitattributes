@@ -1,0 +1,12 @@
+# Normalise line endings in the repository; shell scripts must stay LF so
+# they run on Linux and macOS even when the repository is checked out on Windows.
+* text=auto
+*.sh text eol=lf
+
+# Binary demo material
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.mp4 binary
+*.onnx binary
