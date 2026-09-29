@@ -1,6 +1,10 @@
-# Weekly dependency updates as reviewable pull requests. The cooldown waits a
-# week after a release before proposing it, so a hijacked package version is
-# usually caught and pulled by the registry before it reaches this repository.
+# Weekly dependency updates as reviewable pull requests: one grouped pull
+# request per ecosystem for minor and patch releases. Major versions change
+# APIs and are upgraded deliberately by a maintainer, so they are not proposed
+# automatically (Dependabot alerts still report vulnerable versions).
+# The cooldown waits a week after a release before proposing it, so a hijacked
+# package version is usually caught and pulled by the registry before it
+# reaches this repository.
 version: 2
 updates:
   - package-ecosystem: pip
@@ -9,7 +13,10 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       python:
         patterns: ["*"]
@@ -21,12 +28,17 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       npm:
         patterns: ["*"]
         update-types: [minor, patch]
 
+  # Action majors are kept: the workflows pin commit SHAs, and these pull
+  # requests are how the pins move to new releases.
   - package-ecosystem: github-actions
     directory: /
     schedule:
