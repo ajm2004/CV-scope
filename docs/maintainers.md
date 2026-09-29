@@ -42,10 +42,14 @@ which is why every file there has a code owner and must be read line by line.
 
    or in the browser: **Settings → Rules → Rulesets → New ruleset → Import a
    ruleset**, and choose `.github/rulesets/protect-main.json`. The repository
-   administrator may bypass it only through a pull request: your own pull
-   requests can be merged without a second reviewer (tick *Merge without
-   waiting for requirements* once CI is green), while direct pushes to `main`
-   stay blocked for everyone.
+   administrator is on the bypass list (*Always*): you can push straight to
+   `main` and merge your own pull requests without a second reviewer, while
+   everyone else must go through a pull request with passing checks and your
+   approval. CI still runs on every push to `main`; check the Actions tab
+   after pushing. The bypass covers every rule, including force pushes, so
+   never use `git push --force` on `main`. For a stricter setup, set the
+   bypass to *For pull requests only*: then your own changes also go through
+   a pull request, which you can merge without a second reviewer.
 2. **Settings → General → Pull Requests:** allow **squash merging** only;
    turn on *Always suggest updating pull request branches* and
    *Automatically delete head branches*.
