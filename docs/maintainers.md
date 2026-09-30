@@ -99,6 +99,33 @@ which is why every file there has a code owner and must be read line by line.
 * **Dependabot pull requests** get the same care: read the release notes of
   major updates, and do not merge a dependency you cannot explain.
 
+## Releasing the Windows installer
+
+The installer (`installer/`, described in `installer/README.md`) is built
+and published by `.github/workflows/installer.yml` when a `v*` tag is pushed:
+
+1. Before a release, run `python installer/update_pins.py` (uv on PATH) and
+   review the diff of `installer/pins.json` and `installer/constraints.txt`:
+   they fix what every installation downloads, including the SHA-256 of the
+   PyTorch wheels, uv and Inno Setup. A changed URL or hash deserves the same
+   care as a new dependency.
+2. Set the version in `backend/pyproject.toml` and
+   `backend/pathscope/__init__.py`, and merge.
+3. `git tag vX.Y.Z` on that commit and `git push origin vX.Y.Z`. The
+   workflow checks that the tag matches the version, builds the installer on
+   a clean Windows runner, installs, starts, benchmarks and uninstalls it
+   (`installer/smoke_test.ps1`), then creates the release with
+   `CV-Scope-Setup-Windows-x64.exe` and `SHA256SUMS.txt`. Only that last job
+   has `contents: write`, which it requests itself; the repository default
+   stays read-only.
+4. The website and the README link to
+   `releases/latest/download/CV-Scope-Setup-Windows-x64.exe` and
+   `.../SHA256SUMS.txt`: never rename these assets, and publish releases (not
+   drafts) so that *latest* points at them.
+
+`installer/` is owned by the code owners like `scripts/`: the installer
+runs on users' machines and decides what they download.
+
 ## If something bad was merged
 
 Revert it with a pull request (`git revert <commit>`), check the Actions logs

@@ -105,6 +105,20 @@ Captured from a real run on the corridor sample clip (`docs/screenshots/`).
 
 ## Quick start
 
+### Windows: download the installer
+
+Download **[CV-Scope-Setup-Windows-x64.exe](https://github.com/ajm2004/CV-Scope/releases/latest/download/CV-Scope-Setup-Windows-x64.exe)**
+from the [latest release](https://github.com/ajm2004/CV-Scope/releases/latest)
+and run it. The setup wizard checks for an NVIDIA graphics card, lets you pick
+the detection models and a data folder, and installs everything itself: a
+private Python, PyTorch, the models and the sample videos. You need no
+Python, Node or Git and no administrator rights. Afterwards start **CV-Scope**
+from the Start menu: it starts the server and opens the app in your browser.
+Requirements, updates and troubleshooting are in
+[docs/install-windows.md](docs/install-windows.md).
+
+### From source (Windows, Linux, macOS)
+
 Requirements: Python 3.11+, Node 20+, and optionally an
 NVIDIA GPU with a current driver. Everything runs on CPU as well.
 
@@ -139,6 +153,7 @@ The setup scripts install the `cvscope` command into `.venv`
 environment active:
 
 ```bash
+cvscope launch                     # start the server, open the browser, small window with Open/Stop (what the Windows shortcut runs)
 cvscope serve                      # API and the built UI on http://127.0.0.1:8420 (build it once: cd frontend && npm run build)
 cvscope migrate                    # apply database migrations
 cvscope hardware                   # hardware discovery and detector recommendations
@@ -168,11 +183,13 @@ frontend/   React + TypeScript application (Vite)
 docs/       Architecture, installation, user guide, models, data model, privacy, developer guide
 samples/    Sample scene and experiment configurations, sample video download
 scripts/    Setup and development scripts
+installer/  Windows installer (Inno Setup script, build and release tooling)
 ```
 
 ## Documentation
 
 * `docs/architecture.md` — assessment, technology decisions, folder structure, domain model, hardware and inference strategy, Scene Builder design, phased plan
+* `docs/install-windows.md` — the Windows installer: requirements, setup wizard, updates, uninstalling, silent installs
 * `docs/installation.md` — CPU, NVIDIA GPU, Docker, PostgreSQL, configuration
 * `docs/user-guide.md` — the first experiment, tools, rules, routes, analysis, export
 * `docs/guides/` — 26 step-by-step guides, from a first count to a full study; also in the app under Help → Guides

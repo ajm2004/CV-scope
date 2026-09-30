@@ -48,7 +48,7 @@ MEDIA = ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.bmp", "*.tif", "*.tif
 MEDIA_ALLOWED_UNDER = ("docs/", "frontend/public/")
 
 TEXT_SUFFIXES = {".py", ".ts", ".tsx", ".js", ".mjs", ".cjs", ".json", ".md", ".css", ".html", ".toml",
-                 ".ini", ".cfg", ".yml", ".yaml", ".sh", ".ps1", ".txt", ".mako", ".example", ""}
+                 ".ini", ".cfg", ".yml", ".yaml", ".sh", ".ps1", ".txt", ".mako", ".example", ".iss", ""}
 # Bidirectional controls, zero-width and invisible characters (U+FEFF only allowed as a leading BOM).
 HIDDEN_CODEPOINTS = (*range(0x202A, 0x202F), *range(0x2066, 0x206A), *range(0x200B, 0x200E),
                      *range(0x2060, 0x2065), 0xFEFF, 0x00AD)

@@ -37,6 +37,15 @@ export interface Video {
   created_at: string;
 }
 
+/** A sample clip in samples/videos (downloaded by the installer or scripts/download_samples.py). */
+export interface SampleVideo {
+  name: string;
+  path: string;
+  size_bytes: number;
+  /** Set when the clip is already registered as a video */
+  video_id: number | null;
+}
+
 export type SourceType = "file" | "usb" | "rtsp" | "http";
 
 export interface Camera {

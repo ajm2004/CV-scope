@@ -90,6 +90,9 @@ anomalies.jsonl
 # Internal build brief (not project documentation)
 /ProjectDetails.md
 
+# ---- Windows installer build (uv, Inno Setup, pictures, the built setup) ----------
+/installer/build/
+
 # ---- Python ------------------------------------------------------------------------
 __pycache__/
 *.py[cod]

@@ -126,6 +126,15 @@ unless a signed licence is installed.
 
 ## Try it
 
+On Windows, download
+[CV-Scope-Setup-Windows-x64.exe](https://github.com/ajm2004/CV-Scope/releases/latest/download/CV-Scope-Setup-Windows-x64.exe)
+and follow the setup wizard. It installs everything, including PyTorch for
+your graphics card, the detection models you pick and the sample videos; no
+Python or administrator rights needed. Then open **CV-Scope** from the Start
+menu.
+
+From the source code, on any system:
+
 ```bash
 git clone https://github.com/ajm2004/CV-Scope.git
 cd CV-Scope
@@ -133,7 +142,7 @@ bash scripts/setup.sh      # Windows: powershell -ExecutionPolicy Bypass -File s
 bash scripts/dev.sh        # then open http://localhost:5173
 ```
 
-The setup downloads two short sample videos, so the first experiment works
+Both ways download two short sample videos, so the first experiment works
 without a camera. Full instructions, 26 step-by-step guides and the design
 documentation are in the repository.
 

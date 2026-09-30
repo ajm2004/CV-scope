@@ -23,6 +23,15 @@ shows where everything is. The other guides build on it.
 
 ## Start CV-Scope
 
+**Installed with the Windows installer:** open **CV-Scope** from the Start
+menu. A small CV-Scope window appears, and the browser opens
+http://127.0.0.1:8420 when the server is ready (the first start can take a
+minute). Keep that window open while you work: closing it stops CV-Scope and
+any run in progress. The installer already downloaded the sample videos if
+you kept **Sample videos** ticked.
+
+**From the source folder:**
+
 1. Open a terminal in the CV-Scope folder.
 2. Start the server:
 
@@ -58,10 +67,11 @@ and camera.
 4. **Detector.** The recommended detector is already selected. Click its
    **Download** button and wait until it shows **Installed**. Then click
    **Continue**.
-5. **Camera or video.** Keep **Video file (upload or local file)**. In
-   **Or use a file already on this computer**, type the full path of the
-   corridor sample, for example
-   `C:\Users\you\CV-Scope\samples\videos\people-detection.mp4`. Click
+5. **Camera or video.** Keep **Video file (upload or local file)**. Under
+   **Or start with a sample clip**, click **people-detection.mp4** (the
+   corridor sample). If no sample clip is listed, type its full path in
+   **Or use a file already on this computer**, for example
+   `C:\Users\you\CV-Scope\samples\videos\people-detection.mp4`, and click
    **Use file**. The size and frame rate of the clip appear below. Click
    **Continue**.
 6. **Project.** Set **Project name** to `CV-Scope practice` and

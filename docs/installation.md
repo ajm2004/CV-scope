@@ -14,7 +14,18 @@ development or bundled into the backend in production and Docker builds.
 | GPU (optional) | NVIDIA GPU with a driver supporting CUDA 12.6 or newer; Apple silicon (Metal) is supported through PyTorch MPS |
 | Disk | 3–5 GB for Python packages with CUDA PyTorch, plus model weights (5–130 MB each) |
 
-## Scripted setup (recommended)
+## Windows installer (easiest)
+
+On Windows, the installer sets everything up without Python, Node, Git or
+administrator rights: download
+[CV-Scope-Setup-Windows-x64.exe](https://github.com/ajm2004/CV-Scope/releases/latest/download/CV-Scope-Setup-Windows-x64.exe),
+run it, pick the models, and start CV-Scope from the Start menu. It installs
+a private Python and the right PyTorch build (CPU, CUDA 12.6 or CUDA 13.0) and
+writes the data folder you choose to the installation's `.env`. See
+[install-windows.md](install-windows.md). The sections below are for
+installing from source.
+
+## Scripted setup (recommended for development)
 
 ```
 bash scripts/setup.sh              # Linux / macOS

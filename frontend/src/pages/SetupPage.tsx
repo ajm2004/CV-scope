@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { api } from "../api/client";
-import type { SourceType, Video } from "../api/types";
+import type { SampleVideo, SourceType, Video } from "../api/types";
 import { ErrorNotice, Field, KV, Notice, Panel, Pill, Progress } from "../components/ui";
 import { gb } from "../lib/format";
 import { VideoPicker } from "./CamerasPage";
@@ -19,6 +19,7 @@ export default function SetupPage() {
   const hw = useQuery({ queryKey: ["hardware"], queryFn: () => api.hardware.get(false) });
   const models = useQuery({ queryKey: ["models"], queryFn: api.models.list, refetchInterval: 2000 });
   const settings = useQuery({ queryKey: ["settings"], queryFn: api.settings.get });
+  const samples = useQuery({ queryKey: ["video-samples"], queryFn: api.videos.samples });
   const [chosenModel, setChosenModel] = useState<string>("");
   const [sourceType, setSourceType] = useState<SourceType>("file");
   const [videoId, setVideoId] = useState<number | null>(null);
@@ -52,6 +53,19 @@ export default function SetupPage() {
   const model = models.data?.models.find((m) => m.id === modelId);
   const installedAny = models.data?.models.some((m) => m.task === "detection" && m.installed && m.provider_available) ?? false;
   const canProceedSource = sourceType === "file" ? videoId !== null : uri.trim().length > 0;
+
+  const pickSample = async (s: SampleVideo) => {
+    setError(null);
+    try {
+      const v = s.video_id !== null ? await api.videos.get(s.video_id) : await api.videos.register(s.path);
+      await qc.invalidateQueries({ queryKey: ["videos"] });
+      await qc.invalidateQueries({ queryKey: ["video-samples"] });
+      setVideoId(v.id);
+      setVideo(v);
+    } catch (e) {
+      setError(e);
+    }
+  };
 
   const testConnection = async () => {
     setTestResult(null);
@@ -171,7 +185,20 @@ export default function SetupPage() {
             {sourceType === "file" && (
               <>
                 <VideoPicker value={videoId} onChange={(id, v) => { setVideoId(id); setVideo(v); }} />
-                <div className="hint" style={{ marginTop: 6 }}>Sample clips: run <code>python scripts/download_samples.py</code>, then use the local-file field with <code>samples/videos/people-detection.mp4</code> (absolute path).</div>
+                {samples.data && samples.data.length > 0 ? (
+                  <div className="row" style={{ marginTop: 8, flexWrap: "wrap", gap: 8 }}>
+                    <span className="small">Or start with a sample clip:</span>
+                    {samples.data.map((s) => (
+                      <button key={s.path} type="button" className="btn" onClick={() => pickSample(s)}>
+                        {s.name}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="hint" style={{ marginTop: 6 }}>
+                    No sample clips yet. Choose "Sample videos" in the Windows installer or run <code>python scripts/download_samples.py</code>; they then appear here.
+                  </div>
+                )}
               </>
             )}
             {sourceType !== "file" && (

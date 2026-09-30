@@ -1,0 +1,97 @@
+# Builds the Windows installer, installs it on a clean Windows runner to check
+# it (installer/smoke_test.ps1), and attaches it to the GitHub Release of a
+# v* tag together with SHA256SUMS.txt.
+#
+# The website and the README link to these stable asset names; keep them:
+#   https://github.com/ajm2004/CV-Scope/releases/latest/download/CV-Scope-Setup-Windows-x64.exe
+#   https://github.com/ajm2004/CV-Scope/releases/latest/download/SHA256SUMS.txt
+#
+# Security: runs on tags pushed by maintainers and on manual runs, never on
+# pull requests. Everything the build downloads (uv, Inno Setup) is checked
+# against installer/pins.json; the installer checks PyTorch the same way. Only
+# the publish job gets write access, and it runs no repository code.
+name: Windows installer
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: installer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build-installer
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: The tag matches the version in backend/pyproject.toml
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          $v = (Select-String -Path backend/pyproject.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+          if ("v$v" -ne $env:TAG) { throw "Tag $env:TAG does not match version $v in backend/pyproject.toml" }
+      - name: Build the installer
+        shell: pwsh
+        run: ./installer/build.ps1
+      - name: Install, start, benchmark and uninstall it
+        shell: pwsh
+        run: ./installer/smoke_test.ps1 -Installer installer/build/output/CV-Scope-Setup-Windows-x64.exe -Work "$env:RUNNER_TEMP/cvscope-smoke"
+      - name: Keep the logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: installer-logs
+          path: ${{ runner.temp }}/cvscope-smoke/logs
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: windows-installer
+          path: |
+            installer/build/output/CV-Scope-Setup-Windows-x64.exe
+            installer/build/output/SHA256SUMS.txt
+          if-no-files-found: error
+
+  publish:
+    name: publish-release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: windows-installer
+          path: dist
+      - name: Check the checksum
+        working-directory: dist
+        run: sha256sum -c SHA256SUMS.txt
+      - name: Create the release or replace its installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          files=(dist/CV-Scope-Setup-Windows-x64.exe dist/SHA256SUMS.txt)
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" --verify-tag \
+              --title "CV-Scope $TAG" --generate-notes
+          fi

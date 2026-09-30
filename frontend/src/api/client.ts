@@ -43,6 +43,7 @@ import type {
   TrackSummary,
   TrackerInfo,
   VehicleInput,
+  SampleVideo,
   Video,
   EnrollmentCheck,
   FeedbackSummary,
@@ -171,6 +172,8 @@ export const api = {
       return post<Video>("/api/videos", fd);
     },
     register: (path: string) => post<Video>(`/api/videos/register${qs({ path })}`),
+    get: (id: number) => get<Video>(`/api/videos/${id}`),
+    samples: () => get<SampleVideo[]>("/api/videos/samples"),
     remove: (id: number) => del<void>(`/api/videos/${id}`),
     fileUrl: (id: number) => `/api/videos/${id}/file`,
   },

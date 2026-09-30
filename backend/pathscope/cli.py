@@ -1,4 +1,4 @@
-"""Command line entry point: ``cvscope serve|migrate|hardware|models|benchmark|recognition|anomaly``."""
+"""Command line entry point: ``cvscope serve|launch|migrate|hardware|models|benchmark|recognition|anomaly``."""
 
 from __future__ import annotations
 
@@ -68,13 +68,42 @@ def _models(args: argparse.Namespace) -> None:
     elif args.action == "install":
         import time
 
-        job = manager.install(args.model_id)
-        while job.status in ("queued", "running"):
-            print(f"\r{job.message} {job.progress * 100:5.1f}%", end="", flush=True)
-            time.sleep(0.5)
-        print(f"\n{job.status}: {job.error or job.path}")
-        if job.status == "failed":
+        if not args.model_id:
+            print("name one or more model ids (cvscope models list)", file=sys.stderr)
+            sys.exit(2)
+        # A terminal gets one updating line; a pipe (the Windows installer) whole lines.
+        tty = sys.stdout.isatty()
+        failed = []
+        for model_id in args.model_id:
+            try:
+                job = manager.install(model_id)
+            except KeyError as exc:
+                print(f"failed: {exc.args[0]}", flush=True)
+                failed.append(model_id)
+                continue
+            shown = -1
+            while job.status in ("queued", "running"):
+                if tty:
+                    print(f"\r{job.message} {job.progress * 100:5.1f}%", end="", flush=True)
+                elif int(job.progress * 10) != shown:
+                    shown = int(job.progress * 10)
+                    print(f"{model_id}: {job.message or 'starting'} {job.progress * 100:.0f}%", flush=True)
+                time.sleep(0.5)
+            print(f"{chr(10) if tty else ''}{job.status}: {job.error or job.path}", flush=True)
+            if job.status == "failed":
+                failed.append(model_id)
+        if failed:
+            if len(args.model_id) > 1:
+                print(f"not installed: {', '.join(failed)}", flush=True)
             sys.exit(1)
+
+
+def _launch(args: argparse.Namespace) -> None:
+    from pathscope.launcher import main as launcher_main
+
+    argv = ["--port", str(args.port)] if args.port else []
+    argv += ["--no-browser"] * args.no_browser + ["--console"] * args.console
+    sys.exit(launcher_main(argv))
 
 
 def _benchmark(args: argparse.Namespace) -> None:
@@ -256,6 +285,45 @@ def _anomaly(args: argparse.Namespace) -> None:
     print(f"{i} frames, {s['analyses']} analyses ({s['analysis_ms']:.1f} ms each), {n} updates; per zone: " + ", ".join(f"{z['name']} {z['confirmed']} confirmed / {z['filtered']} filtered" for z in s["zones"]))
 
 
+def _anomaly_setup_local(args: argparse.Namespace) -> None:
+    """Install Ollama (Windows) and download local vision models, as the
+    Anomaly Assistant page does, printing progress lines."""
+    import platform
+    import time
+
+    from pathscope.anomaly.llm.local import get_local_models, ollama_root
+    from pathscope.config import get_settings
+
+    local = get_local_models()
+    root = ollama_root(args.url)
+
+    def wait(job, label: str) -> bool:
+        """Print a line when the message changes or progress passes a 5 % step."""
+        shown: tuple[str, int] | None = None
+        while job.status == "running":
+            step = int(job.progress * 20) if job.progress is not None else -1
+            if shown != (job.message, step):
+                shown = (job.message, step)
+                pct = f" {job.progress * 100:.0f}%" if job.progress is not None else ""
+                print(f"{label}: {job.message}{pct}", flush=True)
+            time.sleep(1.0)
+        print(f"{label}: {job.status}{': ' + job.error if job.error else ''}", flush=True)
+        return job.status == "done"
+
+    status = local.status(root)
+    if not status["installed"]:
+        if platform.system() != "Windows":
+            raise SystemExit(f"Install Ollama first: {status['install_command'] or 'https://ollama.com/download'}")
+        if not wait(local.install(root, get_settings().resolved_data_dir / "anomaly" / "downloads"), "Ollama"):
+            sys.exit(1)
+    elif not status["running"]:
+        print(local.start(root)["message"], flush=True)
+    failed = [m for m in args.models if not wait(local.pull(root, m), m)]
+    if failed:
+        print(f"not downloaded: {', '.join(failed)}", flush=True)
+        sys.exit(1)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="cvscope", description="CV-Scope command line")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -266,6 +334,12 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--reload", action="store_true")
     p.set_defaults(func=_serve)
 
+    p = sub.add_parser("launch", help="Start the server, open it in the browser and show a small control window")
+    p.add_argument("--port", type=int, help="port to use (default PATHSCOPE_PORT, 8420; the next free one when taken)")
+    p.add_argument("--no-browser", action="store_true", help="do not open the browser")
+    p.add_argument("--console", action="store_true", help="no window: print the address and stop on Ctrl+C")
+    p.set_defaults(func=_launch)
+
     p = sub.add_parser("migrate", help="Apply database migrations")
     p.set_defaults(func=_migrate)
 
@@ -274,7 +348,7 @@ def main(argv: list[str] | None = None) -> None:
 
     p = sub.add_parser("models", help="List or install models")
     p.add_argument("action", choices=["list", "install"])
-    p.add_argument("model_id", nargs="?")
+    p.add_argument("model_id", nargs="*", help="one or more model ids to install")
     p.set_defaults(func=_models)
 
     p = sub.add_parser("benchmark", help="Benchmark a model on this machine")
@@ -330,7 +404,11 @@ def main(argv: list[str] | None = None) -> None:
     a.add_argument("--learn", type=float, default=8.0, help="seconds of normal picture learned first")
     a.add_argument("--lighting", action="store_true", help="also report lighting changes")
     a.add_argument("--out", help="folder for the evidence pictures and anomalies.jsonl")
-    p.set_defaults(func=_anomaly)
+    a.set_defaults(func=_anomaly)
+    lo = an.add_parser("setup-local", help="Install Ollama (Windows) and download local vision models for the Anomaly Assistant")
+    lo.add_argument("models", nargs="*", help="models to download, for example qwen2.5vl:3b")
+    lo.add_argument("--url", help="Ollama address (default http://127.0.0.1:11434)")
+    lo.set_defaults(func=_anomaly_setup_local)
 
     args = parser.parse_args(argv)
     args.func(args)

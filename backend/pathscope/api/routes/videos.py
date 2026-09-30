@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from pathscope.api.deps import db_session, get_or_404, settings_dep
 from pathscope.api.schemas import VideoOut
-from pathscope.config import Settings
+from pathscope.config import REPO_ROOT, Settings
 from pathscope.db.models import Camera, Video
 from pathscope.vision.sources import SourceError
 from pathscope.vision.sources.file_source import probe_video_file
@@ -22,6 +22,7 @@ from pathscope.vision.sources.file_source import probe_video_file
 router = APIRouter(prefix="/videos", tags=["videos"])
 
 ALLOWED = {".mp4", ".mov", ".avi", ".mkv", ".m4v", ".webm", ".mpg", ".mpeg", ".ts", ".wmv"}
+SAMPLES_DIR = REPO_ROOT / "samples" / "videos"
 
 
 def _safe_name(name: str) -> str:
@@ -81,6 +82,22 @@ def register_local(path: str = Query(description="Absolute path of a video file 
     if not p.exists() or not p.is_file():
         raise HTTPException(400, f"File not found: {p}")
     return _register(session, p.resolve(), p.name)
+
+
+@router.get("/samples")
+def sample_videos(session: Session = Depends(db_session)) -> list[dict]:
+    """Sample clips downloaded by scripts/download_samples.py (the Windows
+    installer's "Sample videos" option), with the id of the video already
+    registered for each file, so the first-run wizard can offer them."""
+    if not SAMPLES_DIR.is_dir():
+        return []
+    registered = {v.path: v.id for v in session.scalars(select(Video))}
+    samples = []
+    for p in sorted(SAMPLES_DIR.iterdir()):
+        if p.is_file() and p.suffix.lower() in ALLOWED and p.stat().st_size > 0:
+            path = str(p.resolve())
+            samples.append({"name": p.name, "path": path, "size_bytes": p.stat().st_size, "video_id": registered.get(path)})
+    return samples
 
 
 @router.get("/{video_id}", response_model=VideoOut)

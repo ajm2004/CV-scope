@@ -7,6 +7,8 @@
 /.github/                           @ajm2004
 # Scripts people run on their own machines, and what goes into the images
 /scripts/                           @ajm2004
+# The Windows installer: what users download and run, with its pinned hashes
+/installer/                         @ajm2004
 /Dockerfile*                        @ajm2004
 /docker-compose.yml                 @ajm2004
 # Dependencies
